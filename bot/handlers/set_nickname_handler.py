@@ -1,4 +1,5 @@
 import os
+import logging
 
 from aiogram import F
 from aiogram.types import Message
@@ -25,6 +26,11 @@ async def set_nickname_handler(message: Message) -> None:
     ON CONFLICT (user_id)
     DO UPDATE SET
         full_name = excluded.full_name
-    """, helper_id, full_name)
+    """, (helper_id, full_name))
 
     await connect.commit()
+
+    await message.reply(f"Никнейм в базе данных успешно сменен на {full_name}")
+
+
+logging.info("set_nickname_handler.py successful load now")

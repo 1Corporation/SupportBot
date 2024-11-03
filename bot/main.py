@@ -26,7 +26,6 @@ async def main():
     telegram_bot = Bot(os.getenv("BOT_TOKEN"))
     await DatabaseConnection().get_connection()
     import bot.handlers  # load handlers
-    from bot.handlers.profile_command_handler import profile_command_handler
     await dp.start_polling(telegram_bot)
 
 

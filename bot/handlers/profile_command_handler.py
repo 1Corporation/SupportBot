@@ -40,7 +40,7 @@ def __get_helper_id(message: Message) -> Optional[int]:
     """
 
     # Получаем id человека, чью статистику мы хотим увидеть
-    if len(message.text) == 2:
+    if len(message.text.split()) == 2:
         # Если команда вызвана с аргументом, проверим валиден ли переданный юзер айди
         try:
             helper_id = int(message.text.split()[1])
@@ -131,7 +131,7 @@ async def __send_profile_message(message: Message) -> None:
     # Создаем inline keyboard
     builder = InlineKeyboardBuilder()
     builder.add(
-        InlineKeyboardButton(text="Статистика за месяц", callback_data=f"month_stats_{helper_id}"),
+        InlineKeyboardButton(text="Статистика за месяц", callback_data=f"monthstats_{helper_id}"),
         InlineKeyboardButton(text="Логи", callback_data=f"logs_{helper_id}_1")
     )
 
@@ -151,12 +151,15 @@ def get_graphic(*args) -> io.BytesIO:
     :param args: Точки времени на графике
     :return:
     """
+
     plt.figure(figsize=(10, 5))
     colors = ['red', 'orange', 'purple']  # Цвета для каждого графика
     names = ["Сообщения", "Тикеты"]  # Легенды для графиков (в порядке их инициализации
     labels = [names[i] for i in range(len(args))]  # Названия графиков
 
     for idx, timestamps in enumerate(args):
+        if not timestamps:
+            continue
         # Преобразование временных меток в datetime и округление до часов
         dates = [datetime.datetime.fromtimestamp(ts).replace(minute=0, second=0, microsecond=0) for ts in timestamps]
         date_counts = Counter(dates)
@@ -193,4 +196,4 @@ def get_graphic(*args) -> io.BytesIO:
     return img_buf
 
 
-logging.info("profile_command_handler.py handlers successful loaded now")
+logging.info("profile_command_handler.py successful load now")

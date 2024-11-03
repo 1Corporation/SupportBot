@@ -25,3 +25,7 @@ async def main_handler(message: Message):
             f"Script raise error <span>{type(e)}</span> with arguments <span>{e.args}</span>. Please report this to developer - @Justiks",
             parse_mode="html")
         raise
+
+
+logging.info("main_handler.py successful load now")
+
