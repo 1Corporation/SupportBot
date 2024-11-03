@@ -7,6 +7,7 @@ from collections import Counter
 
 from aiogram import F
 from aiogram.types import Message
+from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton
 from aiogram.types import BufferedInputFile
 from aiogram.filters import Command
 from dotenv import load_dotenv
@@ -127,9 +128,20 @@ async def __send_profile_message(message: Message) -> None:
         message_string += f"🔴 {current_hour}:00 🔴\n"
         current_hour += 1
 
+    # Создаем inline keyboard
+    builder = InlineKeyboardBuilder()
+    builder.add(
+        InlineKeyboardButton(text="Статистика за месяц", callback_data=f"month_stats_{helper_id}"),
+        InlineKeyboardButton(text="Логи", callback_data=f"logs_{helper_id}_1")
+    )
+
     # Создаем InputFile
-    photo = BufferedInputFile(get_graphic([i[0] for i in list_of_messages], [j[1] for j in list_of_tickets]).read(), filename="activity_plot.png")
-    await message.answer_photo(photo, caption=message_string, parse_mode="html")
+    photo = BufferedInputFile(
+        get_graphic([i[0] for i in list_of_messages], [j[1] for j in list_of_tickets]).read(),
+        filename="activity_plot.png"
+    )
+
+    await message.answer_photo(photo, caption=message_string, parse_mode="html", reply_markup=builder.as_markup())
 
 
 def get_graphic(*args) -> io.BytesIO:
@@ -152,7 +164,9 @@ def get_graphic(*args) -> io.BytesIO:
         # Определение диапазона дат для текущего графика. Ограничиваем рабочим днем (10 - 21)
         min_date = min(dates).replace(hour=int(os.getenv("WORK_DAY_STARTED_AT")))
         max_date = max(dates).replace(hour=int(os.getenv("WORK_DAY_END_AT")))
-        hours_range = [min_date + datetime.timedelta(hours=i) for i in range(int((max_date - min_date).total_seconds() // 3600) + 1)]
+        hours_range = [min_date + datetime.timedelta(hours=i)
+                       for i in range(int((max_date - min_date).total_seconds() // 3600) + 1)
+                       ]
 
         # Заполнение нулями для пропущенных часов
         counts = [date_counts.get(date, 0) for date in hours_range]
