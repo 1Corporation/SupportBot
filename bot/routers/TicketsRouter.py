@@ -136,7 +136,7 @@ class TicketsRouter(RouterInterface, Singleton):
         # Проверим, есть ли этот помогатор в базе данных
         result_set = await cursor.execute("SELECT user_id FROM helpers WHERE user_id=?", (helper_id,))
         if not await result_set.fetchone():  # Если его нет, добавим
-            await connect.execute("INSERT INTO helpers VALUES (?)", (helper_id,))
+            await connect.execute("INSERT INTO helpers VALUES (?, ?)", (helper_id, message.from_user.full_name))
 
         # Создаем запись в базе данных
         await connect.execute(

@@ -23,7 +23,8 @@ class DatabaseConnection(Singleton):
         # create admin_users table
         await self.connect.execute("""
             CREATE TABLE IF NOT EXISTS helpers (
-               user_id INT PRIMARY KEY 
+               user_id INT PRIMARY KEY,
+               full_name TEXT 
             )
         """)
 
