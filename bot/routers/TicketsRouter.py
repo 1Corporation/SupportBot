@@ -5,7 +5,6 @@
 
 Если нарушена обратная совместимость с ботом-помощником, в первую очередь смотрите сюда
 Скорее всего вам будет легче удалить это, и написать новую имплементацию
-
 """
 
 import os
@@ -16,14 +15,14 @@ from typing import List, Dict
 from aiogram.types import Message
 from dotenv import load_dotenv
 
-from bot.routers import RouterInterface
+from bot.routers.RouterInterface import RouterInterface
 from utils import Singleton, DatabaseConnection
 
 # in this module use .env vars, load it
 load_dotenv()
 
 
-class TicketsRouter(Singleton, RouterInterface):
+class TicketsRouter(RouterInterface, Singleton):
     """
     Наследует Singleton (Одиночка) паттерн
     Реализует интерфейс RouterInterface, основная документация в нем

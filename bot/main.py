@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from aiogram import Bot
 
-from dispatcher import dp
+from bot.dispatcher import dp
 from utils import DatabaseConnection
 
 
@@ -23,10 +23,11 @@ logging.basicConfig(handlers=(file_log, console_out),
 
 
 async def main():
-    bot = Bot(os.getenv("BOT_TOKEN"))
+    telegram_bot = Bot(os.getenv("BOT_TOKEN"))
     await DatabaseConnection().get_connection()
     import bot.handlers  # load handlers
-    await dp.start_polling(bot)
+    from bot.handlers.profile_command_handler import profile_command_handler
+    await dp.start_polling(telegram_bot)
 
 
 if __name__ == '__main__':
