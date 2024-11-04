@@ -58,6 +58,7 @@ class CallBackDataRouter(RouterInterface, Singleton):
 
         await method(message, *method_args)
 
+    # noinspection PyMethodMayBeStatic
     async def __month_stats(self, message: Message, user_id) -> None:
         """
         Этот метод почти полностью повторяет имплементацию метода __send_profile_message из profile_command_handler.py
@@ -92,7 +93,8 @@ class CallBackDataRouter(RouterInterface, Singleton):
             return
 
         # Эта строка отправится в сообщении
-        message_string = f"📊 Статистика помощника <code>{helper_id}</code> за <b>{datetime.datetime.now().date()}</b>: \n\n"
+        message_string = \
+            f"📊 Статистика помощника <code>{helper_id}</code> за <b>{datetime.datetime.now().date()}</b>: \n\n"
 
         amount_of_opened_tickets = len(list_of_tickets)
         amount_of_closed_tickets = len([ticket for ticket in list_of_tickets if ticket[2] is not None])
@@ -131,6 +133,7 @@ class CallBackDataRouter(RouterInterface, Singleton):
             counts = [date_counts.get(date, 0) for date in hours_range]
 
             # Построение линии на графике для текущего списка
+            # noinspection PyTypeChecker
             plt.plot(hours_range, counts, color=colors[idx % len(colors)], marker='o', linestyle='-', label=labels[idx])
 
         # Настройки осей и формата даты
@@ -149,7 +152,12 @@ class CallBackDataRouter(RouterInterface, Singleton):
         img_buf.seek(0)  # Сброс указателя на начало файла
         plt.close()  # Закрываем график, чтобы освободить память
 
-        await message.answer_photo(BufferedInputFile(img_buf.read(), filename="caption.png"), caption=message_string, parse_mode='html')
+        await message.answer_photo(
+            BufferedInputFile(img_buf.read(), filename="caption.png"),
+            caption=message_string,
+            parse_mode='html'
+        )
 
+    # noinspection PyMethodMayBeStatic
     async def __logs(self, message: Message, user_id, page) -> None:
         await message.answer("Разраб даун, пока без логов. Спасибо!")

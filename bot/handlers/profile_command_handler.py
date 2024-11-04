@@ -27,7 +27,12 @@ SECONDS_IN_HOUR = 3600
 
 # this handler work in admin chat only
 @dp.message(Command("profile"), F.chat.id == int(os.getenv("CHAT_ID")))
-async def profile_command_handler(message: Message):
+async def profile_command_handler(message: Message) -> None:
+    """
+    Покажет статистику по помощнику за этот день
+    :param message: aiogram types Message
+    :return: None
+    """
     logging.debug("profile_command_handler work now")
     await __send_profile_message(message)
 

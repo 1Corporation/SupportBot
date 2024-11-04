@@ -11,14 +11,11 @@ load_dotenv()
 
 
 class DatabaseConnection(Singleton):
+    # noinspection PyAttributeOutsideInit
     def init(self):
         self.connect: Optional[aiosqlite.Connection] = None
 
     async def create_tables(self):
-        # await self.connect.execute("""CREATE TABLE IF NOT EXISTS messages (
-        #     message TEXT PRIMARY KEY
-        #     )
-        # """)
 
         # create admin_users table
         await self.connect.execute("""
