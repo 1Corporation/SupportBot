@@ -55,7 +55,8 @@ class TicketsRouter(RouterInterface, Singleton):
         split_text = text.split()
 
         # stop method if message no valid
-        if not self.__validate_message(split_text):
+        if not self.__validate_message(*split_text):
+            await self.__answer_to_ticket(message)
             return
 
         command = split_text[0]
@@ -108,6 +109,7 @@ class TicketsRouter(RouterInterface, Singleton):
 
         # Делаем запись
         await connect.execute("INSERT INTO messages VALUES (?, ?)", (message.from_user.id, time.time()))
+        await connect.commit()
 
     # noinspection PyMethodMayBeStatic
     async def __get_ticket(self, message: Message) -> None:
@@ -182,14 +184,19 @@ class TicketsRouter(RouterInterface, Singleton):
         ticket_author_id = ? AND 
         start_time = (SELECT MAX(start_time) FROM tickets)  
         """
+
         # Взял именно максимальное значение start_time, так как исходя из всех условий которые есть в коде
         # Должна обновиться только самая последняя запись
-        await DatabaseConnection().connect.execute(
+        connect = DatabaseConnection().connect
+
+        await connect.execute(
             database_request, (
                 time.time(),
                 helper_id,
                 ticket_author_id
             ))
+
+        await connect.commit()
 
         # Если все ок, отправляем сообщение
         await message.reply(os.getenv("CLOSE_TICKET_MESSAGE"))

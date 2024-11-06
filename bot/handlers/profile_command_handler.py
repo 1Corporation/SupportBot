@@ -2,7 +2,6 @@ import os
 import io
 import datetime
 import logging
-import warnings
 from typing import Optional
 from collections import Counter
 
@@ -13,6 +12,7 @@ from aiogram.types import BufferedInputFile
 from aiogram.filters import Command
 from dotenv import load_dotenv
 from matplotlib import pyplot as plt
+from matplotlib import font_manager
 import matplotlib.dates as mdates
 
 from bot.dispatcher import dp
@@ -142,7 +142,17 @@ async def __send_profile_message(message: Message) -> None:
 
     # Проверим, а есть ли данные по этому помощнику
     if len(list_of_tickets) == 0:
-        await message.reply("Не найдено данных по этому помощнику")
+        # Создаем inline keyboard
+        builder = InlineKeyboardBuilder()
+        builder.add(
+            InlineKeyboardButton(text="Статистика за месяц", callback_data=f"monthstats_{helper_id}"),
+            # InlineKeyboardButton(text="Логи", callback_data=f"logs_{helper_id}_1")
+        )
+        await message.reply(
+            "Сегодня по этому помощнику нет данных 😢",
+            parse_mode="html",
+            reply_markup=builder.as_markup()
+        )
         return
 
     # Эта строка отправится в сообщении
@@ -182,7 +192,7 @@ async def __send_profile_message(message: Message) -> None:
     builder = InlineKeyboardBuilder()
     builder.add(
         InlineKeyboardButton(text="Статистика за месяц", callback_data=f"monthstats_{helper_id}"),
-        InlineKeyboardButton(text="Логи", callback_data=f"logs_{helper_id}_1")
+        # InlineKeyboardButton(text="Логи", callback_data=f"logs_{helper_id}_1")
     )
 
     # Создаем InputFile

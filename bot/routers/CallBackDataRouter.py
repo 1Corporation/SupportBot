@@ -75,6 +75,13 @@ class CallBackDataRouter(RouterInterface, Singleton):
         helper_id = int(user_id)
         month_started_at = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0).timestamp()
 
+        full_name = await (await cursor.execute(
+            """
+            SELECT full_name FROM helpers
+            WHERE user_id = ?
+            """, (helper_id,)
+        )).fetchone()
+
         list_of_tickets = await (await cursor.execute(
             "SELECT ticket_author_id, start_time, end_time \
             FROM tickets WHERE helper_id = ? AND start_time > ? \
@@ -94,7 +101,7 @@ class CallBackDataRouter(RouterInterface, Singleton):
 
         # Эта строка отправится в сообщении
         message_string = \
-            f"📊 Статистика помощника <code>{helper_id}</code> за <b>{datetime.datetime.now().date()}</b>: \n\n"
+            f"📊 Статистика помощника <code>{full_name[0]}</code> за этот месяц: \n\n"
 
         amount_of_opened_tickets = len(list_of_tickets)
         amount_of_closed_tickets = len([ticket for ticket in list_of_tickets if ticket[2] is not None])
