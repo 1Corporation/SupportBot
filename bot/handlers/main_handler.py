@@ -23,7 +23,7 @@ async def main_handler(message: Message):
     except Exception as e:  # TicketsRouter().handle() can raise exceptions. Except this
         await message.reply(
             f"Script raise error {type(e)} with arguments {e.args}. Please report this to developer - @Justiks",
-            parse_mode="html")
+            )
         raise
 
 

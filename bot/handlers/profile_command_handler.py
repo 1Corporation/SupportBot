@@ -2,6 +2,7 @@ import os
 import io
 import datetime
 import logging
+import warnings
 from typing import Optional
 from collections import Counter
 
@@ -37,7 +38,44 @@ async def profile_command_handler(message: Message) -> None:
     await __send_profile_message(message)
 
 
-def __get_helper_id(message: Message) -> Optional[int]:
+async def __get_helper_id(message: Message) -> Optional[int]:
+    """
+    Возвращает id помощника, чей профиль нужно показать
+    Возвращает id основываясь на переданных аргументах: никнейм, айди, либо отсутствие аргументов вообще
+    :param message: aiogram Message object
+    :return: None or helper id
+    """
+
+    args = message.text.split()[1:]  # Получаем все аргументы переданные с командой
+    args_amount = len(args)
+
+    # Если нет аргументов - вернем id человека вызывающего команду
+    if not args_amount:
+        return message.from_user.id
+
+    # Если есть один аргумент, и он похож на id - вернем его
+    if args_amount == 1 and args[0].isdigit():
+        return int(args[0])
+
+    # Если прошлые 2 условия не выполнились, будем искать по никнейму:
+
+    connect = DatabaseConnection().connect
+    cursor = await connect.cursor()
+
+    query = await (await cursor.execute(
+        """
+        SELECT (user_id) FROM helpers
+        WHERE full_name = ?
+        """, (" ".join(args), )
+    )).fetchone()
+
+    if not query:
+        return None
+
+    return query[0]
+
+
+def __get_helper_id_deprecated(message: Message) -> Optional[int]:
     """
 
     :param message: aiogram Message object
@@ -66,7 +104,7 @@ async def __send_profile_message(message: Message) -> None:
     :return: None
     """
 
-    helper_id = __get_helper_id(message)
+    helper_id = await __get_helper_id(message)
 
     # Если нету helper_id, остановим функцию
     if not helper_id:
@@ -81,6 +119,13 @@ async def __send_profile_message(message: Message) -> None:
 
     connect = DatabaseConnection().connect
     cursor = await connect.cursor()
+
+    full_name = await (await cursor.execute(
+        """
+        SELECT full_name FROM helpers
+        WHERE user_id = ?
+        """, (helper_id, )
+    )).fetchone()
 
     # Получаем нужные значения из базы данных
     list_of_tickets = await (await cursor.execute(
@@ -101,7 +146,7 @@ async def __send_profile_message(message: Message) -> None:
         return
 
     # Эта строка отправится в сообщении
-    message_string = f"📊 Статистика помощника <code>{helper_id}</code> за <b>{datetime.datetime.now().date()}</b>: \n\n"
+    message_string = f"📊 Статистика помощника <code>{full_name[0]}</code> за <b>{datetime.datetime.now().date()}</b>: \n\n"
 
     amount_of_opened_tickets = len(list_of_tickets)
     amount_of_closed_tickets = len([ticket for ticket in list_of_tickets if ticket[2] is not None])

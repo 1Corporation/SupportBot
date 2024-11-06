@@ -46,6 +46,10 @@ class TicketsRouter(RouterInterface, Singleton):
 
         logging.debug("TicketsRouter handle method work now")
 
+        # Сообщение может не иметь текста и вызывать ошибку, исправим
+        if not message.text:
+            return
+
         # Стандартизируем текст
         text = message.text.lower()
         split_text = text.split()
