@@ -73,7 +73,7 @@ class CallBackDataRouter(RouterInterface, Singleton):
         cursor = await connect.cursor()
 
         helper_id = int(user_id)
-        month_started_at = datetime.datetime.now().replace(day=1, hour=0, minute=0, second=0).timestamp()
+        month_started_at = (datetime.datetime.now() - datetime.timedelta(days=30)).timestamp()
 
         full_name = await (await cursor.execute(
             """
