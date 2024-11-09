@@ -175,6 +175,7 @@ class TicketsRouter(RouterInterface, Singleton):
             await message.reply("Попытка удалить не существующий тикет. Как вы это сделали?!")
             return
 
+        # TODO: Оптимизировать запрос
         # Даже не буду никакие ошибки хандлить, если что-то пошло через жопу, то точно еще 40 строк назад.
         # Сохранил в отдельную переменную, так как запрос звучит крипова
         database_request = """
@@ -182,7 +183,7 @@ class TicketsRouter(RouterInterface, Singleton):
         SET end_time = ?
         WHERE helper_id = ? AND
         ticket_author_id = ? AND 
-        start_time = (SELECT MAX(start_time) FROM tickets)  
+        start_time = (SELECT MAX(start_time) FROM tickets WHERE ticket_author_id = ? AND helper_id = ?)  
         """
 
         # Взял именно максимальное значение start_time, так как исходя из всех условий которые есть в коде
@@ -193,7 +194,9 @@ class TicketsRouter(RouterInterface, Singleton):
             database_request, (
                 time.time(),
                 helper_id,
-                ticket_author_id
+                ticket_author_id,
+                ticket_author_id,
+                helper_id
             ))
 
         await connect.commit()
