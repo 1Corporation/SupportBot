@@ -246,6 +246,14 @@ class State:
         # Если не нашли
         raise ValueError("Попытка удалить не существующий тикет из списка тикетов")
 
+    def show_tickets(self) -> List:
+        """
+        Возвращает список всех тикетов. Используется в get_tickets_executor
+        :return: list - список всех тикетов
+        """
+
+        return self.__tickets
+
     def exists(self) -> bool:
         """
         Возвращает bool, true если в списке есть tickets, иначе false
@@ -320,3 +328,18 @@ class AdminStates:
         if not state:
             return False
         return state.exists()
+
+    @classmethod
+    def show_tickets(cls, user_id: int) -> List:
+        """
+        Возвращает список открытых тикетов в данный момент для данного помощника
+        :param user_id: id помощника
+        :return: список тикетов
+        """
+
+        state = cls.__states.get(user_id)
+
+        if not state:
+            return []
+
+        return state.show_tickets()
