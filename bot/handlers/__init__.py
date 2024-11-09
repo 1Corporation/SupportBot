@@ -2,6 +2,7 @@ from bot.handlers import profile_command_handler
 from bot.handlers import set_nickname_handler
 from bot.handlers import excel_report_handler
 from bot.handlers import get_tickets_handler
+from bot.handlers import month_excel_handler
 from bot.handlers import main_handler
 from bot.handlers import callback_query_handler
 
@@ -10,4 +11,5 @@ __all__ = ["main_handler",
            "callback_query_handler",
            "set_nickname_handler",
            "excel_report_handler",
-           "get_tickets_handler"]
+           "get_tickets_handler",
+           "month_excel_handler"]

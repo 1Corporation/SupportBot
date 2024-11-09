@@ -36,7 +36,7 @@ class CallBackDataRouter(RouterInterface, Singleton):
         # noinspection PyAttributeOutsideInit
         self.methods = {
             "monthstats": self.__month_stats,
-            "logs": self.__logs
+            "logs": self.__logs,
         }
 
     async def handle(self, message: Message, *args, **kwargs) -> None:
@@ -162,7 +162,7 @@ class CallBackDataRouter(RouterInterface, Singleton):
         await message.answer_photo(
             BufferedInputFile(img_buf.read(), filename="caption.png"),
             caption=message_string,
-            parse_mode='html'
+            parse_mode='html',
         )
 
     # noinspection PyMethodMayBeStatic
